@@ -1,6 +1,7 @@
 #!/bin/bash
-# Define some files we'll use.
+# Define variables.
 WATERMARK="./watermark.txt"
+UPDATE_WATERMARK=false
 
 # Verify a URL was passed.
 if (( $# != 1 )); then
@@ -26,12 +27,21 @@ if [ -f "$WATERMARK" ]; then
             echo "Nothing to do!"
         else
             echo "We need to post to Masto!"
+            UPDATE_WATERMARK=true
         fi
     else
         # Post to Masto because the watermark is blank.
         echo "We need to post to Masto!"
+        UPDATE_WATERMARK=true
     fi
 else
     # Post to Masto because there is no watermark file.
     echo "We need to post to Masto!"
+    UPDATE_WATERMARK=true
+fi
+
+# Check if the watermark needs to be updated.
+if [[ "$UPDATE_WATERMARK" == true ]]; then
+    echo "Update the watermark."
+    echo $POST_DATE > $WATERMARK
 fi
