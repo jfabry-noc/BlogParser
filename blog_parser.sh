@@ -1,4 +1,17 @@
 #!/bin/bash
+# Function to handle posting to Mastodon.
+masto_post() {
+    # Parse together the post content.
+    local POST_CONTENT="$POST_TITLE\n\n$POST_LINK"
+    local FORMATTED_CONTENT=$(echo -e "$POST_CONTENT")
+    local FULL_URL=$(echo "$MASTO_INSTANCE/api/v1/statuses")
+
+    # Make the post via curl.
+    curl -s -X POST -H "Authorization: Bearer $MASTO_KEY" \
+        --form "status=$FORMATTED_CONTENT" \
+        $FULL_URL > /dev/null
+}
+
 # Define variables.
 WATERMARK="./watermark.txt"
 UPDATE_WATERMARK=false
@@ -49,9 +62,9 @@ else
 fi
 
 # Get the most recent post title, link, and date.
-#POST_TITLE=$(curl -s $1 | xmllint --xpath "//rss/channel/item/title/text()" - | head -1)
-#POST_LINK=$(curl -s $1 | xmllint --xpath "//rss/channel/item/link/text()" - | head -1)
-#POST_DATE=$(curl -s $1 | xmllint --xpath "//rss/channel/item/pubDate/text()" - | head -1)
+POST_TITLE=$(curl -s $RSS_PATH | xmllint --xpath "//rss/channel/item/title/text()" - | head -1)
+POST_LINK=$(curl -s $RSS_PATH | xmllint --xpath "//rss/channel/item/link/text()" - | head -1)
+POST_DATE=$(curl -s $RSS_PATH | xmllint --xpath "//rss/channel/item/pubDate/text()" - | head -1)
 
 # Compare the date to the watermark.
 POST_DATE="Mon, 10 Aug 2020 00:00:00 +0000"
@@ -62,25 +75,20 @@ if [ -f "$WATERMARK" ]; then
     # Make sure it actually contained something.
     if [ -n "${WATERMARK_VALUE}" ]; then
         # Compare the two.
-        if [[ "$WATERMARK_VALUE" == "$POST_DATE" ]]; then
-            echo "Nothing to do!"
-        else
-            echo "We need to post to Masto!"
+        if [[ ! "$WATERMARK_VALUE" == "$POST_DATE" ]]; then
             UPDATE_WATERMARK=true
         fi
     else
         # Post to Masto because the watermark is blank.
-        echo "We need to post to Masto!"
         UPDATE_WATERMARK=true
     fi
 else
     # Post to Masto because there is no watermark file.
-    echo "We need to post to Masto!"
     UPDATE_WATERMARK=true
 fi
 
-# Check if the watermark needs to be updated.
+# Check if the watermark needs to be updated and if the post needs to be pushed.
 if [[ "$UPDATE_WATERMARK" == true ]]; then
-    echo "Update the watermark."
+    masto_post
     echo $POST_DATE > $WATERMARK
 fi
