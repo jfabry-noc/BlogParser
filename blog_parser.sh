@@ -2,11 +2,50 @@
 # Define variables.
 WATERMARK="./watermark.txt"
 UPDATE_WATERMARK=false
+CONFIG_FILE="./config.sh"
 
-# Verify a URL was passed.
-if (( $# != 1 )); then
-    echo "The index file must be passed as a parameter!"
-    exit
+# Check for the configuration file.
+if [ ! -f $CONFIG_FILE ]; then
+    # Start the interactive prompt for user information.
+    echo "Enter your Mastodon instance."
+    echo -n "> "
+    read MASTO_INSTANCE
+    echo "Enter your Mastodon key."
+    echo -n "> "
+    read MASTO_KEY
+    echo "Enter your RSS feed."
+    echo -n "> "
+    read RSS_PATH
+
+    # Save in a file for future use.
+    echo "MASTO_INSTANCE=$MASTO_INSTANCE" > $CONFIG_FILE
+    echo "MASTO_KEY=$MASTO_KEY" >> $CONFIG_FILE
+    echo "RSS_PATH=$RSS_PATH" >> $CONFIG_FILE
+else
+    # Import the file.
+    source $CONFIG_FILE
+
+    # Verify there are values for all 3 variables.
+    if [ -z "$MASTO_INSTANCE" ]; then
+        echo "Enter your Mastodon instance."
+        echo -n "> "
+        read MASTO_INSTANCE
+        echo "MASTO_INSTANCE=$MASTO_INSTANCE" >> $CONFIG_FILE
+    fi
+
+    if [ -z "$MASTO_KEY" ]; then
+        echo "Enter your Mastodon key."
+        echo -n "> "
+        read MASTO_KEY
+        echo "MASTO_KEY=$MASTO_KEY" >> $CONFIG_FILE
+    fi
+
+    if [ -z "$RSS_PATH" ]; then
+        echo "Enter your RSS feed."
+        echo -n "> "
+        read RSS_PATH
+        echo "RSS_PATH=$RSS_PATH" >> $CONFIG_FILE
+    fi
 fi
 
 # Get the most recent post title, link, and date.
