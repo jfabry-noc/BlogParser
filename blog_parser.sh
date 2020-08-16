@@ -12,6 +12,9 @@ masto_post() {
         $FULL_URL > /dev/null
 }
 
+# Get to the expected directory.
+cd /home/john/code/BlogParser
+
 # Define variables.
 WATERMARK="./watermark.txt"
 UPDATE_WATERMARK=false
