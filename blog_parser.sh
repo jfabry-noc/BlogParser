@@ -70,7 +70,6 @@ POST_LINK=$(curl -s $RSS_PATH | xmllint --xpath "//rss/channel/item/link/text()"
 POST_DATE=$(curl -s $RSS_PATH | xmllint --xpath "//rss/channel/item/pubDate/text()" - | head -1)
 
 # Compare the date to the watermark.
-POST_DATE="Mon, 10 Aug 2020 00:00:00 +0000"
 if [ -f "$WATERMARK" ]; then
     # Get the stored watermark.
     WATERMARK_VALUE=$(cat $WATERMARK)
