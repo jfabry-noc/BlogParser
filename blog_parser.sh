@@ -20,6 +20,13 @@ WATERMARK="./watermark.txt"
 UPDATE_WATERMARK=false
 CONFIG_FILE="./config.sh"
 
+# Make sure xmllint is installed.
+XMLLINT_PATH=$(which xmllint 2> /dev/null)
+if [[ -z $XMLLINT_PATH ]]; then
+    echo "xmllint is missing from this system."
+    exit
+fi
+
 # Check for the configuration file.
 if [ ! -f $CONFIG_FILE ]; then
     # Start the interactive prompt for user information.
