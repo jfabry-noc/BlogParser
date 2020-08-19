@@ -72,9 +72,9 @@ else
 fi
 
 # Get the most recent post title, link, and date.
-POST_TITLE=$(curl -s $RSS_PATH | xmllint --xpath "//rss/channel/item/title/text()" - | head -1)
-POST_LINK=$(curl -s $RSS_PATH | xmllint --xpath "//rss/channel/item/link/text()" - | head -1)
-POST_DATE=$(curl -s $RSS_PATH | xmllint --xpath "//rss/channel/item/pubDate/text()" - | head -1)
+POST_TITLE=$(curl -s $RSS_PATH | xmllint --xpath "//rss/channel/descendant::item[1]/title/text()" -)
+POST_LINK=$(curl -s $RSS_PATH | xmllint --xpath "//rss/channel/descendant::item[1]/link/text()" -)
+POST_DATE=$(curl -s $RSS_PATH | xmllint --xpath "//rss/channel/descendant::item[1]/pubDate/text()" -)
 
 # Compare the date to the watermark.
 if [ -f "$WATERMARK" ]; then
